@@ -26,3 +26,6 @@ Caddyfile
 Dockerfile.prod
 docker-compose.prod.yml
 PLAN.md
+
+# Go build output
+bin/
