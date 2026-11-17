@@ -3,7 +3,7 @@ version: "3.8"
 services:
   diputadodeldia-back:
     container_name: ddd-back
-    build: ./backend
+    build: ./legacy/backend
     ports:
       - "5000:5000"
     volumes:
@@ -11,7 +11,7 @@ services:
 
   diputadodeldia-front:
     container_name: ddd-front
-    build: ./frontend
+    build: ./legacy/frontend
     ports:
       - "3000:3000"
 

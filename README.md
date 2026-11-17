@@ -1,6 +1,11 @@
 <h1>
-  <a href="https://diputado.labs.clcert.cl">#DiputadxDelDia</a>
+  <a href="?">#DiputadxDelDia</a>
 </h1>
+
+> **🚧 Proyecto en reestructuración.**
+> Esta rama (`restructure-go`) está reescribiendo el proyecto en componentes independientes: *retrieval* (scrapers), *chooser* (selección del congresista del día), *jobs*, *API* (Go) y *webapp*, con soporte planificado para diputados y senadores.
+> El código actual (Python + Next.js) se conserva en [`legacy/`](legacy) y sigue siendo el que funciona por ahora. Las carpetas nuevas (`cmd/`, `internal/`, `data/`, `deploy/`, `webapp/`) están vacías y se irán poblando por fases.
+> Las instrucciones de abajo describen la versión *legacy*, por lo que las rutas `backend/` y `frontend/` ahora son `legacy/backend/` y `legacy/frontend/`.
 
 La aplicación **#DiputadxDelDia** elige al azar un(a) Diputado(a) del Congreso Nacional de Chile utilizando el valor aleatorio generado por el [Faro de Aleatoriedad de la Universidad de Chile](https://random.uchile.cl) a las 00:00 horas (Chile Continental GMT -04:00 durante hora de invierno) de cada día (el Faro utiliza huso horario GMT). A dicha hora se revela la siguiente información del congresista elegido:
 * Edad.
@@ -21,12 +26,12 @@ Dentro del presente repositorio se dispone de un script de verificación, el cua
 ### Requisitos para Verificación
 
 * Python 3.0+
-* Instalar requerimientos: `$ pip3 install -r backend/requirements.txt`
+* Instalar requerimientos: `$ pip3 install -r legacy/backend/requirements.txt`
 
 _**Nota:** Sugerimos utilizar un ambiente virtual._
 
 ### Ejecutar Script de Verificación
-El _script_ se encuentra dentro de la carpeta `backend`, y es llamado `updater.py`. El _script_ recibe los siguientes parámetros:
+El _script_ se encuentra dentro de la carpeta `legacy/backend`, y es llamado `updater.py`. El _script_ recibe los siguientes parámetros:
 ```
 $ python updater.py --verify [opcion] [valor]
 
@@ -66,7 +71,7 @@ La aplicación quedará corriendo en `localhost:3000`.
 Primero será necesario levantar el backend, para ello seguimos los siguientes pasos:
 ```bash
 # Cambio de directorio
-$ cd backend
+$ cd legacy/backend
 
 # Instalación de requisitos
 $ pip3 install -r requirements.txt
@@ -84,7 +89,7 @@ $ python3 webapp.py
 Para levantar el frontend, habrá que usar *node package updater*:
 ```
 # Cambio de directorio
-$ cd frontend
+$ cd legacy/frontend
 
 # Instalación de paquetes
 $ npm install
