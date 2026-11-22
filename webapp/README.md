@@ -1,6 +1,6 @@
 # Webapp
 
-Sitio estático en SvelteKit que muestra el congresista del día y los 7 días anteriores. Se construye consultando la [API](../internal/api) y no necesita servidor en producción: el resultado queda en `build/`.
+Sitio estático en SvelteKit que muestra el parlamentario del día y los 7 días anteriores. Se construye consultando la [API](../internal/api) y no necesita servidor en producción: el resultado queda en `build/`.
 
 ## Comandos
 
@@ -43,6 +43,6 @@ src/
         ├── ui/            # piezas genéricas: Badge, SectionCard, StackedBar, ...
         ├── layout/        # cabecera y pie
         ├── day/           # página del día, selector de días, verificación del sorteo
-        ├── profile/       # ficha del congresista
+        ├── profile/       # ficha del parlamentario
         ├── attendance/  activity/  votings/  expenses/
 ```

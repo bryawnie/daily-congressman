@@ -42,20 +42,20 @@
 </script>
 
 <svelte:head>
-  <title>Cómo funciona el sorteo · Congresista del día</title>
+  <title>Cómo funciona el sorteo · Parlamentario del día</title>
   <meta
     name="description"
-    content="Cómo se elige al congresista del día con aleatoriedad pública y cómo repetir el sorteo tú mismo."
+    content="Cómo se elige al parlamentario del día con aleatoriedad pública y cómo repetir el sorteo tú mismo."
   />
 </svelte:head>
 
 <article>
   <p class="back">
-    <a href="/"><Icon icon={faArrowLeft} /> Volver al congresista del día</a>
+    <a href="/"><Icon icon={faArrowLeft} /> Volver al parlamentario del día</a>
   </p>
   <h1>Cómo funciona el sorteo</h1>
   <p class="lead">
-    El congresista del día es seleccionado mediante un número aleatorio público
+    El parlamentario del día es seleccionado mediante un número aleatorio público
     que ninguna persona controla, y cualquiera puede repetir el cálculo para
     comprobarlo.
   </p>
@@ -93,7 +93,7 @@
   </section>
 
   <section>
-    <h2>Cómo se elige al congresista</h2>
+    <h2>Cómo se elige al parlamentario</h2>
     <ol>
       <li>
         Se toma el pulso que el faro generó a las <strong

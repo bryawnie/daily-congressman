@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-	<title>{isMissingPage ? 'Página no encontrada' : 'Algo salió mal'} · Congresista del día</title>
+	<title>{isMissingPage ? 'Página no encontrada' : 'Algo salió mal'} · Parlamentario del día</title>
 </svelte:head>
 
 <section>
@@ -18,7 +18,7 @@
 			No pudimos mostrar esta página. Intenta de nuevo más tarde.
 		{/if}
 	</p>
-	<a href="/">Ver el congresista del día</a>
+	<a href="/">Ver el parlamentario del día</a>
 </section>
 
 <style>

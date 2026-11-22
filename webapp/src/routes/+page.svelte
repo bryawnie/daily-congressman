@@ -8,5 +8,5 @@
 {#if data.day}
 	<DayPage day={data.day} daySummaries={data.daySummaries} />
 {:else}
-	<p>Todavía no se ha sorteado ningún congresista. Vuelve después de las 00:00.</p>
+	<p>Todavía no se ha sorteado ningún parlamentario. Vuelve después de las 00:00.</p>
 {/if}

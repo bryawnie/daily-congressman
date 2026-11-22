@@ -25,10 +25,10 @@
 </script>
 
 <svelte:head>
-	<title>{name} · Congresista del día</title>
+	<title>{name} · Parlamentario del día</title>
 	<meta
 		name="description"
-		content="{roleTitle(day.congressman)} {name}: asistencia, votaciones y gastos del congresista del día."
+		content="{roleTitle(day.congressman)} {name}: asistencia, votaciones y gastos del parlamentario del día."
 	/>
 </svelte:head>
 
