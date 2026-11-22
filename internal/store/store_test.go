@@ -162,14 +162,14 @@ func TestChildRowsRoundTrip(t *testing.T) {
 	}
 
 	laws := []congress.LawProject{
-		{ProjectID: 1, Name: "A", Type: "Moción", Status: "En trámite", Date: "2026-01-01"},
-		{ProjectID: 2, Name: "B", Type: "Moción", Status: "Archivado", Date: "2026-03-01"},
+		{Bulletin: "100-01", Name: "A", Type: "Moción", Status: "En trámite", Date: "2026-01-01"},
+		{Bulletin: "200-02", Name: "B", Type: "Moción", Status: "Archivado", Date: "2026-03-01"},
 	}
 	if err := s.UpsertLawProjects(ctx, id, laws); err != nil {
 		t.Fatal(err)
 	}
 	gotLaws, _ := s.ListLawProjects(ctx, id)
-	if len(gotLaws) != 2 || gotLaws[0].ProjectID != 2 {
+	if len(gotLaws) != 2 || gotLaws[0].Bulletin != "200-02" {
 		t.Fatalf("law projects = %+v", gotLaws)
 	}
 }
@@ -186,7 +186,8 @@ func TestReplaceVotingsDropsPreviousOnes(t *testing.T) {
 	if err := s.ReplaceVotings(ctx, id, first); err != nil {
 		t.Fatal(err)
 	}
-	second := []congress.Voting{{VotingID: 3, Date: "2026-03-01", BulletinNumber: "1236-05", VotedOption: "Abstención"}}
+	second := []congress.Voting{{VotingID: 3, Date: "2026-03-01", BulletinNumber: "1236-05", VotedOption: "Abstención",
+		Quorum: "Mayoría simple", Result: "Aprobado"}}
 	if err := s.ReplaceVotings(ctx, id, second); err != nil {
 		t.Fatal(err)
 	}
@@ -194,7 +195,8 @@ func TestReplaceVotingsDropsPreviousOnes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(got) != 1 || got[0].VotingID != 3 || got[0].BulletinNumber != "1236-05" {
+	if len(got) != 1 || got[0].VotingID != 3 || got[0].BulletinNumber != "1236-05" ||
+		got[0].Quorum != "Mayoría simple" || got[0].Result != "Aprobado" {
 		t.Fatalf("votings = %+v", got)
 	}
 }

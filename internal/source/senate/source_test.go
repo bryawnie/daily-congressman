@@ -2,7 +2,6 @@ package senate
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -51,7 +50,7 @@ func TestCurrentMembers(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	got, err := New(WithBaseURL(srv.URL)).CurrentMembers(context.Background())
+	got, err := New(WithAPIURL(srv.URL)).CurrentMembers(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -86,7 +85,7 @@ func TestCurrentMembersErrors(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			srv := serve(body)
 			defer srv.Close()
-			if _, err := New(WithBaseURL(srv.URL)).CurrentMembers(context.Background()); err == nil {
+			if _, err := New(WithAPIURL(srv.URL)).CurrentMembers(context.Background()); err == nil {
 				t.Fatal("expected error")
 			}
 		})
@@ -97,15 +96,8 @@ func TestCurrentMembersErrors(t *testing.T) {
 			w.WriteHeader(http.StatusForbidden)
 		}))
 		defer srv.Close()
-		if _, err := New(WithBaseURL(srv.URL)).CurrentMembers(context.Background()); err == nil {
+		if _, err := New(WithAPIURL(srv.URL)).CurrentMembers(context.Background()); err == nil {
 			t.Fatal("expected error")
 		}
 	})
-}
-
-func TestUnimplementedMethodsAreNotSupported(t *testing.T) {
-	_, err := New().Profile(context.Background(), congress.Member{})
-	if !errors.Is(err, congress.ErrNotSupported) {
-		t.Fatalf("err = %v", err)
-	}
 }

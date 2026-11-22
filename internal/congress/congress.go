@@ -84,16 +84,20 @@ type Voting struct {
 	TotalApproved   int
 	TotalRejected   int
 	TotalAbstention int
-	Result          string
+	// Quorum is the rule the voting needed (e.g. "Mayoría simple").
+	Quorum string
+	// Result is "Aprobado" or "Rechazado". A source that does not publish it may
+	// calculate it from the quorum, or leave it empty when it cannot.
+	Result string
 }
 
 // LawProject is a bill or motion presented by a congressman.
 type LawProject struct {
-	ProjectID int
-	Name      string
-	Type      string
-	Status    string
-	Date      string // YYYY-MM-DD
+	Bulletin string // e.g. "18442-07"; identifies the project in both chambers
+	Name     string
+	Type     string
+	Status   string
+	Date     string // YYYY-MM-DD
 }
 
 // OperationalExpense is the amount spent in one category in a month.

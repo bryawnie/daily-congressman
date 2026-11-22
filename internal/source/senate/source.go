@@ -1,4 +1,8 @@
 // Package senate implements the Source interface for the Senate.
+//
+// All the data comes from the Senate's public back end (web-back.senado.cl), the
+// same JSON API its website uses, plus the senator's page on www.senado.cl for a
+// few profile fields. No browser is needed.
 package senate
 
 import (
@@ -13,43 +17,46 @@ import (
 	"github.com/bryawnie/daily-congressman/internal/congress"
 )
 
-// DefaultBaseURL is the Senate's back end. The public website embeds the
-// responses of this API, so no browser is needed.
-const DefaultBaseURL = "https://web-back.senado.cl"
-
-// currentMembersPath lists the sitting senators ("vigentes", chamber "S").
-// The limit is above the 50 seats so the list is never cut.
-const currentMembersPath = "/api/hemicycle?vigentes=1&camara=S&limit=100"
+const (
+	// DefaultAPIURL is the Senate's back end.
+	DefaultAPIURL = "https://web-back.senado.cl"
+	// DefaultSiteURL is the Senate's website, used for the senator's page.
+	DefaultSiteURL = "https://www.senado.cl"
+)
 
 // Source is the Senate data source. It embeds congress.Unsupported, so every
-// method not implemented here returns congress.ErrNotSupported.
-//
-// TODO, in the order the data is needed:
-//   - Profile.
-//   - Attendance.
-//   - Votings.
-//   - Activity.
-//   - Expenses.
+// method not implemented here returns congress.ErrNotSupported (the Senate
+// does not publish support staff or offices as separate data, for example).
 type Source struct {
 	congress.Unsupported
-	baseURL string
+	apiURL  string
+	siteURL string
 	client  *http.Client
+	now     func() time.Time
 }
 
 // Option customizes a Source.
 type Option func(*Source)
 
-// WithBaseURL overrides the back end base URL (used by tests).
-func WithBaseURL(u string) Option { return func(s *Source) { s.baseURL = strings.TrimRight(u, "/") } }
+// WithAPIURL overrides the back end base URL (used by tests).
+func WithAPIURL(u string) Option { return func(s *Source) { s.apiURL = strings.TrimRight(u, "/") } }
+
+// WithSiteURL overrides the website base URL (used by tests).
+func WithSiteURL(u string) Option { return func(s *Source) { s.siteURL = strings.TrimRight(u, "/") } }
 
 // WithHTTPClient overrides the HTTP client.
 func WithHTTPClient(c *http.Client) Option { return func(s *Source) { s.client = c } }
 
+// WithClock overrides the clock (used by tests).
+func WithClock(now func() time.Time) Option { return func(s *Source) { s.now = now } }
+
 // New returns the Senate source.
 func New(opts ...Option) *Source {
 	s := &Source{
-		baseURL: DefaultBaseURL,
+		apiURL:  DefaultAPIURL,
+		siteURL: DefaultSiteURL,
 		client:  &http.Client{Timeout: 30 * time.Second},
+		now:     time.Now,
 	}
 	for _, o := range opts {
 		o(s)
@@ -60,73 +67,59 @@ func New(opts ...Option) *Source {
 // Chamber reports the chamber this source belongs to.
 func (*Source) Chamber() congress.Chamber { return congress.Senate }
 
-type hemicycleResponse struct {
-	Status string `json:"status"`
-	Data   struct {
-		Parlamentarios struct {
-			Total int `json:"total"`
-			Data  []struct {
-				ID            int    `json:"ID_PARLAMENTARIO"`
-				FirstName     string `json:"NOMBRE"`
-				FirstSurname  string `json:"APELLIDO_PATERNO"`
-				SecondSurname string `json:"APELLIDO_MATERNO"`
-				Chamber       string `json:"CAMARA"`
-			} `json:"data"`
-		} `json:"parlamentarios"`
-	} `json:"data"`
+// envelope is the wrapper of every back end response.
+type envelope struct {
+	Status string          `json:"status"`
+	Data   json.RawMessage `json:"data"`
 }
 
-// CurrentMembers returns the sitting senators.
-//
-// The list is rejected if it looks incomplete (fewer entries than the total the
-// API announces), because a draw from a partial list would not be uniform.
-func (s *Source) CurrentMembers(ctx context.Context) ([]congress.Member, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.baseURL+currentMembersPath, nil)
+// getJSON calls a back end operation (path with its query) and decodes the
+// "data" field of the response into out.
+func (s *Source) getJSON(ctx context.Context, path string, out any) error {
+	body, err := s.fetch(ctx, s.apiURL+path)
+	if err != nil {
+		return err
+	}
+	var env envelope
+	if err := json.Unmarshal(body, &env); err != nil {
+		return fmt.Errorf("senate: %s: parse response: %w", path, err)
+	}
+	if env.Status != "" && env.Status != "ok" {
+		return fmt.Errorf("senate: %s: response status %q", path, env.Status)
+	}
+	if err := json.Unmarshal(env.Data, out); err != nil {
+		return fmt.Errorf("senate: %s: parse data: %w", path, err)
+	}
+	return nil
+}
+
+func (s *Source) fetch(ctx context.Context, url string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 	resp, err := s.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("senate: fetch members: %w", err)
+		return nil, fmt.Errorf("senate: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("senate: fetch members: unexpected status %s", resp.Status)
+		return nil, fmt.Errorf("senate: %s: unexpected status %s", url, resp.Status)
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("senate: read members: %w", err)
+		return nil, fmt.Errorf("senate: %s: read body: %w", url, err)
 	}
-	return parseMembers(body)
+	return body, nil
 }
 
-func parseMembers(body []byte) ([]congress.Member, error) {
-	var doc hemicycleResponse
-	if err := json.Unmarshal(body, &doc); err != nil {
-		return nil, fmt.Errorf("senate: parse members: %w", err)
+// checkMember rejects members from other chambers.
+func checkMember(m congress.Member) error {
+	if m.Chamber != congress.Senate {
+		return fmt.Errorf("senate: member %d belongs to chamber %q", m.ExternalID, m.Chamber)
 	}
-	if doc.Status != "" && doc.Status != "ok" {
-		return nil, fmt.Errorf("senate: members response status %q", doc.Status)
+	if m.ExternalID == 0 {
+		return fmt.Errorf("senate: member without id")
 	}
-	list := doc.Data.Parlamentarios
-	if len(list.Data) == 0 {
-		return nil, fmt.Errorf("senate: no members found in response")
-	}
-	if list.Total != len(list.Data) {
-		return nil, fmt.Errorf("senate: incomplete list: announced %d, received %d", list.Total, len(list.Data))
-	}
-
-	members := make([]congress.Member, 0, len(list.Data))
-	for _, p := range list.Data {
-		if p.ID == 0 {
-			return nil, fmt.Errorf("senate: member without id: %+v", p)
-		}
-		if p.Chamber != "S" {
-			return nil, fmt.Errorf("senate: member %d is from chamber %q, not the Senate", p.ID, p.Chamber)
-		}
-		// Some names carry stray spaces, and some have no second surname.
-		name := strings.Join(strings.Fields(p.FirstName+" "+p.FirstSurname+" "+p.SecondSurname), " ")
-		members = append(members, congress.Member{Chamber: congress.Senate, ExternalID: p.ID, Name: name})
-	}
-	return members, nil
+	return nil
 }

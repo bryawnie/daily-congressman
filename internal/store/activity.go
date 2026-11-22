@@ -78,8 +78,8 @@ func (s *Store) ReplaceVotings(ctx context.Context, congressmanID int64, votings
 			if _, err := tx.ExecContext(ctx, `
 				INSERT INTO votings (congressman_id, voting_id, voting_date, bulletin_number,
 					document_title, article_text, voted_option, total_approved, total_rejected,
-					total_abstention, result)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+					total_abstention, quorum, result)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				ON CONFLICT (congressman_id, voting_id) DO UPDATE SET
 					voting_date = excluded.voting_date,
 					bulletin_number = excluded.bulletin_number,
@@ -89,9 +89,10 @@ func (s *Store) ReplaceVotings(ctx context.Context, congressmanID int64, votings
 					total_approved = excluded.total_approved,
 					total_rejected = excluded.total_rejected,
 					total_abstention = excluded.total_abstention,
+					quorum = excluded.quorum,
 					result = excluded.result`,
 				congressmanID, v.VotingID, v.Date, v.BulletinNumber, v.DocumentTitle, v.ArticleText,
-				v.VotedOption, v.TotalApproved, v.TotalRejected, v.TotalAbstention, v.Result); err != nil {
+				v.VotedOption, v.TotalApproved, v.TotalRejected, v.TotalAbstention, v.Quorum, v.Result); err != nil {
 				return err
 			}
 		}
@@ -103,7 +104,7 @@ func (s *Store) ReplaceVotings(ctx context.Context, congressmanID int64, votings
 func (s *Store) ListVotings(ctx context.Context, congressmanID int64) ([]congress.Voting, error) {
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT voting_id, voting_date, bulletin_number, document_title, article_text,
-			voted_option, total_approved, total_rejected, total_abstention, result
+			voted_option, total_approved, total_rejected, total_abstention, quorum, result
 		FROM votings WHERE congressman_id = ?
 		ORDER BY voting_date DESC, voting_id DESC`, congressmanID)
 	if err != nil {
@@ -114,7 +115,7 @@ func (s *Store) ListVotings(ctx context.Context, congressmanID int64) ([]congres
 	for rows.Next() {
 		var v congress.Voting
 		if err := rows.Scan(&v.VotingID, &v.Date, &v.BulletinNumber, &v.DocumentTitle, &v.ArticleText,
-			&v.VotedOption, &v.TotalApproved, &v.TotalRejected, &v.TotalAbstention, &v.Result); err != nil {
+			&v.VotedOption, &v.TotalApproved, &v.TotalRejected, &v.TotalAbstention, &v.Quorum, &v.Result); err != nil {
 			return nil, err
 		}
 		out = append(out, v)
@@ -127,15 +128,15 @@ func (s *Store) UpsertLawProjects(ctx context.Context, congressmanID int64, proj
 	return s.inTx(ctx, func(tx *sql.Tx) error {
 		for _, p := range projects {
 			if _, err := tx.ExecContext(ctx, `
-				INSERT INTO law_projects (congressman_id, project_id, project_name, project_type,
+				INSERT INTO law_projects (congressman_id, bulletin, project_name, project_type,
 					project_status, project_date)
 				VALUES (?, ?, ?, ?, ?, ?)
-				ON CONFLICT (congressman_id, project_id) DO UPDATE SET
+				ON CONFLICT (congressman_id, bulletin) DO UPDATE SET
 					project_name = excluded.project_name,
 					project_type = excluded.project_type,
 					project_status = excluded.project_status,
 					project_date = excluded.project_date`,
-				congressmanID, p.ProjectID, p.Name, p.Type, p.Status, p.Date); err != nil {
+				congressmanID, p.Bulletin, p.Name, p.Type, p.Status, p.Date); err != nil {
 				return err
 			}
 		}
@@ -146,9 +147,9 @@ func (s *Store) UpsertLawProjects(ctx context.Context, congressmanID int64, proj
 // ListLawProjects returns the projects of a congressman, most recent first.
 func (s *Store) ListLawProjects(ctx context.Context, congressmanID int64) ([]congress.LawProject, error) {
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT project_id, project_name, project_type, project_status, project_date
+		SELECT bulletin, project_name, project_type, project_status, project_date
 		FROM law_projects WHERE congressman_id = ?
-		ORDER BY project_date DESC, project_id DESC`, congressmanID)
+		ORDER BY project_date DESC, bulletin DESC`, congressmanID)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +157,7 @@ func (s *Store) ListLawProjects(ctx context.Context, congressmanID int64) ([]con
 	var out []congress.LawProject
 	for rows.Next() {
 		var p congress.LawProject
-		if err := rows.Scan(&p.ProjectID, &p.Name, &p.Type, &p.Status, &p.Date); err != nil {
+		if err := rows.Scan(&p.Bulletin, &p.Name, &p.Type, &p.Status, &p.Date); err != nil {
 			return nil, err
 		}
 		out = append(out, p)

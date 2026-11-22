@@ -47,6 +47,7 @@ CREATE TABLE votings (
     total_approved   INTEGER NOT NULL DEFAULT 0,
     total_rejected   INTEGER NOT NULL DEFAULT 0,
     total_abstention INTEGER NOT NULL DEFAULT 0,
+    quorum           TEXT NOT NULL DEFAULT '',
     result           TEXT NOT NULL DEFAULT '',
     PRIMARY KEY (congressman_id, voting_id)
 );
@@ -80,12 +81,12 @@ CREATE TABLE expenses_support_staff (
 
 CREATE TABLE law_projects (
     congressman_id INTEGER NOT NULL REFERENCES congressmen(id) ON DELETE CASCADE,
-    project_id     INTEGER NOT NULL,
+    bulletin       TEXT NOT NULL,
     project_name   TEXT NOT NULL DEFAULT '',
     project_type   TEXT NOT NULL DEFAULT '',
     project_status TEXT NOT NULL DEFAULT '',
     project_date   TEXT NOT NULL DEFAULT '',
-    PRIMARY KEY (congressman_id, project_id)
+    PRIMARY KEY (congressman_id, bulletin)
 );
 
 -- One congressman per day. The choice is stored when made and never recomputed.
