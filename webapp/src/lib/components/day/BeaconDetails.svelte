@@ -7,6 +7,7 @@
 		faTerminal
 	} from '@fortawesome/free-solid-svg-icons';
 	import Icon from '#lib/components/ui/Icon.svelte';
+	import { reveal } from '#lib/motion/actions.ts';
 	import type { Beacon } from '#lib/types.ts';
 
 	let { beacon }: { beacon: Beacon } = $props();
@@ -34,7 +35,7 @@
 	);
 </script>
 
-<section>
+<section use:reveal>
 	<h2><Icon icon={faFingerprint} /> Cómo se eligió a este parlamentario</h2>
 	<p>
 		El sorteo usa el valor aleatorio del pulso de las 00:00 (hora de Chile) del

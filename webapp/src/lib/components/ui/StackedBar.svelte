@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ToneSegment } from '#lib/types.ts';
+	import { wipe } from '#lib/motion/actions.ts';
 	import { formatPercent, ratioOf } from '#lib/format/number.ts';
 
 	let { segments }: { segments: ToneSegment[] } = $props();
@@ -8,7 +9,7 @@
 </script>
 
 <div class="stack">
-	<div class="bar" aria-hidden="true">
+	<div class="bar" aria-hidden="true" use:wipe>
 		{#each segments as segment (segment.label)}
 			{#if segment.value > 0}
 				<span

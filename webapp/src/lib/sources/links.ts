@@ -11,8 +11,6 @@ export interface SourceLinks {
 	expenses: SourceLink | null;
 }
 
-// Where each section can be checked on the chamber's own website. Only the
-// Senate is linked for now; a missing address means no link rather than a wrong one.
 export function sourceLinksOf(profile: Profile): SourceLinks {
 	if (profile.chamber !== 'senate') {
 		return { attendance: null, activity: null, votings: null, expenses: null };

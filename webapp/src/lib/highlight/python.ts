@@ -11,11 +11,9 @@ const KEYWORDS = new Set([
 ]);
 const BUILTINS = new Set(['print', 'sorted', 'len', 'int', 'range', 'open', 'str', 'list', 'dict']);
 
-// Order matters: the first alternative that matches at a position wins.
 const TOKEN =
 	/(?<comment>#[^\n]*)|(?<string>[frbFRB]{0,2}(?:"""[\s\S]*?"""|'''[\s\S]*?'''|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'))|(?<word>[A-Za-z_][A-Za-z0-9_]*)|(?<number>\d+(?:\.\d+)?)/gy;
 
-// A small tokenizer, enough to color the example script. It is not a full Python lexer.
 export function tokenizePython(source: string): PythonToken[] {
 	const tokens: PythonToken[] = [];
 	let plain = '';

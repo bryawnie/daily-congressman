@@ -1,5 +1,6 @@
 <script lang="ts">
-  // Hemicycle: three rows of seats, one of them highlighted as the chosen one.
+  import { animate, stagger } from "motion";
+
   const CENTER_X = 100;
   const CENTER_Y = 88;
   const rows = [
@@ -20,9 +21,39 @@
     }),
   );
   const chosen = seats.find((seat) => seat.highlighted);
+
+  function intro(svg: SVGSVGElement) {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const dots = svg.querySelectorAll(".seat");
+    const halo = svg.querySelector(".halo");
+    const chosenSeat = svg.querySelector(".chosen");
+
+    animate(
+      dots,
+      { opacity: [0, 1], scale: [0.3, 1] },
+      { duration: 0.5, delay: stagger(0.018), ease: "backOut" },
+    );
+    const controls: { stop: () => void }[] = [];
+    if (chosenSeat) {
+      controls.push(
+        animate(chosenSeat, { scale: [0, 1.25, 1] }, { duration: 0.7, delay: 0.7 }),
+      );
+    }
+    if (halo) {
+      controls.push(
+        animate(
+          halo,
+          { scale: [1, 1.6, 1], opacity: [0.9, 0.2, 0.9] },
+          { duration: 2.6, delay: 1.4, repeat: Infinity, ease: "easeInOut" },
+        ),
+      );
+    }
+    return { destroy: () => controls.forEach((control) => control.stop()) };
+  }
 </script>
 
-<svg viewBox="30 18 140 76" aria-hidden="true" focusable="false">
+<svg viewBox="30 18 140 76" aria-hidden="true" focusable="false" use:intro>
   {#each seats as seat}
     {#if !seat.highlighted}
       <circle class="seat" cx={seat.x} cy={seat.y} r="3.8" />
@@ -39,6 +70,11 @@
     inline-size: 4.5rem;
     block-size: auto;
     flex: none;
+  }
+
+  circle {
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
   .seat {

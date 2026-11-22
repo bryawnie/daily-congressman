@@ -379,7 +379,6 @@
     line-height: 1.6;
   }
 
-  /* Colors of the Python logo: blue and yellow. */
   pre {
     --python-blue: light-dark(oklch(45% 0.11 250), oklch(72% 0.11 250));
     --python-blue-soft: light-dark(oklch(55% 0.12 245), oklch(80% 0.09 245));

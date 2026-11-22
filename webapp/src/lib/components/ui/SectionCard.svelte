@@ -2,12 +2,13 @@
 	import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import type { SectionCardProps } from '#lib/types.ts';
 	import Icon from './Icon.svelte';
+	import { reveal } from '#lib/motion/actions.ts';
 
 	let { title, icon, description, source = null, pending = false, children }: SectionCardProps = $props();
 	const headingId = $props.id();
 </script>
 
-<section class="card" aria-labelledby={headingId}>
+<section class="card" aria-labelledby={headingId} use:reveal>
 	<header>
 		<h2 id={headingId}>
 			{#if icon}<Icon {icon} />{/if}
