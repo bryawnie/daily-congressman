@@ -36,6 +36,9 @@
 	<p>
 		<a href={pulseUrl} target="_blank" rel="noreferrer">Ver este pulso en el faro de aleatoriedad</a>
 	</p>
+	<p>
+		<a href="/como-funciona">Aprende cómo funciona el sorteo y verifícalo con un script</a>
+	</p>
 </details>
 
 <style>
