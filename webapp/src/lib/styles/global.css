@@ -1,0 +1,105 @@
+:root {
+	color-scheme: light dark;
+
+	--color-page: light-dark(oklch(97.5% 0.004 255), oklch(19% 0.012 255));
+	--color-surface: light-dark(oklch(100% 0 0), oklch(24% 0.014 255));
+	--color-surface-sunken: light-dark(oklch(95.5% 0.006 255), oklch(21% 0.012 255));
+	--color-border: light-dark(oklch(89% 0.008 255), oklch(34% 0.015 255));
+	--color-text: light-dark(oklch(24% 0.02 255), oklch(94% 0.008 255));
+	--color-text-muted: light-dark(oklch(46% 0.02 255), oklch(73% 0.015 255));
+	--color-accent: light-dark(oklch(48% 0.16 262), oklch(76% 0.11 262));
+	--color-focus: light-dark(oklch(55% 0.19 262), oklch(80% 0.12 262));
+
+	--tone-positive: light-dark(oklch(52% 0.13 155), oklch(74% 0.14 155));
+	--tone-warning: light-dark(oklch(68% 0.14 75), oklch(80% 0.13 80));
+	--tone-negative: light-dark(oklch(55% 0.18 27), oklch(72% 0.15 27));
+	--tone-neutral: light-dark(oklch(65% 0.015 255), oklch(60% 0.015 255));
+	--tone-accent: var(--color-accent);
+
+	--radius-small: 0.375rem;
+	--radius-medium: 0.75rem;
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.5rem;
+	--space-6: 2rem;
+	--space-7: 3rem;
+	--page-width: 64rem;
+	--page-gutter: clamp(1rem, 4vw, 2rem);
+
+	font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+	line-height: 1.5;
+	font-size: 100%;
+}
+
+[data-tone='positive'] {
+	--tone: var(--tone-positive);
+}
+[data-tone='warning'] {
+	--tone: var(--tone-warning);
+}
+[data-tone='negative'] {
+	--tone: var(--tone-negative);
+}
+[data-tone='neutral'] {
+	--tone: var(--tone-neutral);
+}
+[data-tone='accent'] {
+	--tone: var(--tone-accent);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	background: var(--color-page);
+	color: var(--color-text);
+}
+
+h1,
+h2,
+h3 {
+	margin: 0;
+	line-height: 1.2;
+	text-wrap: balance;
+}
+
+p {
+	margin: 0;
+	text-wrap: pretty;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+a {
+	color: var(--color-accent);
+}
+
+img {
+	display: block;
+	max-inline-size: 100%;
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-focus);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition-duration: 0.01ms !important;
+		animation-duration: 0.01ms !important;
+	}
+}
