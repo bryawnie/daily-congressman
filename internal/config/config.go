@@ -16,6 +16,11 @@ const (
 	DefaultJobsInterval = 15 * time.Minute
 	// DefaultJobsPause is the wait between two congressmen in a monthly sync.
 	DefaultJobsPause = 500 * time.Millisecond
+	// DefaultAPIAddr is where the API listens when API_ADDR is not set.
+	DefaultAPIAddr = ":8080"
+	// DefaultCORSOrigins is used when API_CORS_ORIGINS is not set: the API is
+	// public and read-only.
+	DefaultCORSOrigins = "*"
 )
 
 // Config is the runtime configuration shared by the binaries.
@@ -28,6 +33,11 @@ type Config struct {
 	JobsInterval time.Duration
 	// JobsPause is the wait between congressmen in a monthly sync (JOBS_PAUSE).
 	JobsPause time.Duration
+	// APIAddr is the address the API listens on (API_ADDR).
+	APIAddr string
+	// CORSOrigins are the origins allowed to call the API (API_CORS_ORIGINS,
+	// comma separated; "*" allows any).
+	CORSOrigins []string
 }
 
 // Load reads the configuration from the environment.
@@ -38,6 +48,9 @@ func Load() Config {
 
 		JobsInterval: getduration("JOBS_INTERVAL", DefaultJobsInterval),
 		JobsPause:    getduration("JOBS_PAUSE", DefaultJobsPause),
+
+		APIAddr:     getenv("API_ADDR", DefaultAPIAddr),
+		CORSOrigins: splitList(getenv("API_CORS_ORIGINS", DefaultCORSOrigins)),
 	}
 }
 

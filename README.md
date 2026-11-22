@@ -3,7 +3,7 @@
 </h1>
 
 > **🚧 Proyecto en reestructuración.**
-> La rama `restructure-go` reescribe el proyecto en Go, por componentes. Ya funcionan el sorteo (*chooser*), la extracción de datos (*retrieval*) y los trabajos programados (*jobs*), por ahora **solo para el Senado**. La API y la webapp vienen después, y los diputados dependen de poder leer los datos de la Cámara (ver [Estado](#estado)).
+> La rama `restructure-go` reescribe el proyecto en Go, por componentes. Ya funcionan el sorteo (*chooser*), la extracción de datos (*retrieval*), los trabajos programados (*jobs*) y la API, por ahora **solo para el Senado**. La webapp viene después, y los diputados dependen de poder leer los datos de la Cámara (ver [Estado](#estado)).
 > El código anterior (Python + Next.js) se conserva en [`legacy/`](legacy).
 
 **#DiputadxDelDia** elige cada día a un(a) congresista de Chile usando el valor aleatorio del [Faro de Aleatoriedad de la Universidad de Chile](https://random.uchile.cl) a las 00:00 (hora de Chile). Una vez elegido, se reúne su información:
@@ -21,7 +21,7 @@
 | Retrieval | `internal/source`, `internal/retrieval`, `cmd/retrieval` | Lee los datos de cada cámara y los guarda en SQLite |
 | Chooser | `internal/chooser`, `internal/beacon`, `cmd/chooser` | Sorteo del día a partir del pulso del Faro |
 | Jobs | `internal/jobs`, `cmd/jobs` | Programa la sincronización y el sorteo |
-| API | `cmd/api` | Pendiente |
+| API | `internal/api`, `cmd/api` | Sirve el congresista del día y los 7 anteriores (solo lectura) |
 | Webapp | `webapp/` | Pendiente |
 
 Cada cámara es una `Source` (`internal/congress/source.go`) registrada en un `Registry`; agregar una cámara es implementar esa interfaz. Los datos van en SQLite (`DB_PATH`, por defecto `data/congressmen.db`).
@@ -111,7 +111,19 @@ cp .env.example .env     # ajustar CHOOSER_CHAMBERS, etc.
 docker compose up --build -d
 ```
 
-Levanta `jobs serve` con la base en el volumen `data`. La imagen (`deploy/Dockerfile`) se construye por binario con `--build-arg BINARY=jobs|api`; la API se agregará con el mismo volumen cuando exista.
+Levanta `jobs serve` y la API (puerto `API_PORT`, 8080 por defecto), ambos con la base en el volumen `data`. La imagen (`deploy/Dockerfile`) se construye por binario con `--build-arg BINARY=jobs|api`.
+
+## API
+
+Solo lectura; no necesita navegador ni acceso a las fuentes, solo la base. Variables: `API_ADDR` (`:8080`) y `API_CORS_ORIGINS` (`*`).
+
+| Ruta | Respuesta |
+|---|---|
+| `GET /days?limit=8` | `{"days": [...]}`: hoy y los 7 previos (1 a 31), el más reciente primero |
+| `GET /days/{YYYY-MM-DD}` | Un día; 404 si no se sorteó, 400 si la fecha es inválida |
+| `GET /health` | `{"status":"ok"}` si la base responde |
+
+Cada día trae el perfil, el pulso del Faro (`beacon`), `attendance`, `activity` (conteo por estado), `votings` y `expenses` de los últimos 6 meses, con `stats.global` (promedio, mínimo, máximo y posición dentro de su misma cámara) y `stats.local` (lo mismo, solo con quienes comparten su distrito, en diputados, o región, en senadores). Lo que aún no se ha extraído viene `null` o vacío y su nombre aparece en `pending`; un dato extraído que no tiene registros es un cero, no un pendiente.
 
 ## Legacy
 

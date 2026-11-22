@@ -14,5 +14,22 @@ services:
     volumes:
       - data:/data
 
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        BINARY: api
+    restart: unless-stopped
+    environment:
+      API_ADDR: ${API_ADDR:-:8080}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-*}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      - data:/data
+    depends_on:
+      - jobs
+
 volumes:
   data:
