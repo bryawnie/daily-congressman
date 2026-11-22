@@ -163,7 +163,7 @@ func (s *Source) Votings(ctx context.Context, m congress.Member, limit int) ([]c
 			if err != nil {
 				return nil, fmt.Errorf("senate: voting %d has a bad date %q: %w", r.ID, r.Date, err)
 			}
-			title, article := splitTopic(r.Topic)
+			title, article := splitTopic(cleanText(r.Topic))
 			out = append(out, congress.Voting{
 				VotingID:        r.ID,
 				Date:            date.Format("2006-01-02"),

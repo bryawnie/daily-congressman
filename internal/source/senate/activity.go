@@ -79,7 +79,7 @@ func (s *Source) Activity(ctx context.Context, m congress.Member) ([]congress.La
 			}
 			projects = append(projects, congress.LawProject{
 				Bulletin: r.Bulletin,
-				Name:     r.Summary,
+				Name:     cleanText(r.Summary),
 				Type:     "Moción",
 				Status:   r.Status,
 				Date:     date,

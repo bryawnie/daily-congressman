@@ -169,6 +169,32 @@ func TestActivityReadsTheLegislaturesOfTheCurrentPeriod(t *testing.T) {
 	}
 }
 
+func TestTextsAreDecodedFromHTMLEntities(t *testing.T) {
+	_, s := newFake(t, map[string]func(*http.Request) string{
+		"/api/hemicycle":    static(hemicycleJSON),
+		"/api/legislatures": static(legislaturesJSON),
+		"/api/parliamentarians/motions": static(`{"status":"ok","data":{"total":1,"data":[
+			{"BOLETIN":"18578-37","SUMA":"Declara el día 30 de septiembre como el &quot;Día del Soldado&quot; &amp; otros","FECHA":"12/08/2026","ESTADO":"En tramitación"}]}}`),
+		"/api/votes": static(`{"status":"ok","data":{"total":1,"data":[
+			{"ID_VOTACION":1,"FECHA_VOTACION":"20-11-2026 02:18:49","TEMA":"Indicación &quot;A&quot; (Mayoría Simple)\nAutores: Pérez &amp; Soto","QUORUM":"Mayoría simple","BOLETIN":"1-1","SI":1,"NO":0,"ABS":0,
+			 "VOTACIONES":{"SI":[{"PARLID":1501}],"NO":0,"ABSTENCION":0,"PAREO":0}}]}}`),
+	})
+	acts, err := s.Activity(context.Background(), balladares)
+	if err != nil || len(acts) != 1 {
+		t.Fatalf("activity = %+v, %v", acts, err)
+	}
+	if want := `Declara el día 30 de septiembre como el "Día del Soldado" & otros`; acts[0].Name != want {
+		t.Fatalf("motion name = %q, want %q", acts[0].Name, want)
+	}
+	votes, err := s.Votings(context.Background(), balladares, 10)
+	if err != nil || len(votes) != 1 {
+		t.Fatalf("votings = %+v, %v", votes, err)
+	}
+	if votes[0].DocumentTitle != `Indicación "A" (Mayoría Simple)` || votes[0].ArticleText != "Autores: Pérez & Soto" {
+		t.Fatalf("voting texts = %q / %q", votes[0].DocumentTitle, votes[0].ArticleText)
+	}
+}
+
 func TestActivityRejectsMotionsWithoutBulletin(t *testing.T) {
 	_, s := newFake(t, map[string]func(*http.Request) string{
 		"/api/hemicycle":    static(hemicycleJSON),

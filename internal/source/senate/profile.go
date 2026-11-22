@@ -103,6 +103,14 @@ func parseSenatorPage(page []byte) (senatorPage, error) {
 	return out, nil
 }
 
+// cleanText decodes the HTML entities that the Senate leaves in some texts
+// (for example &quot; in the summary of a motion) and trims the spaces. Unlike
+// plainText it keeps the line breaks, which separate the title of a voting
+// from its text.
+func cleanText(s string) string {
+	return strings.TrimSpace(html.UnescapeString(s))
+}
+
 // plainText removes the HTML tags and entities and collapses the whitespace.
 func plainText(s string) string {
 	s = html.UnescapeString(tagRe.ReplaceAllString(s, " "))
