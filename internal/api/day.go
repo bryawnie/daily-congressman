@@ -66,6 +66,7 @@ type Profile struct {
 	FirstSurname      string       `json:"firstSurname"`
 	SecondSurname     string       `json:"secondSurname"`
 	Picture           string       `json:"picture"`
+	ProfileURL        string       `json:"profileUrl"`
 	Gender            string       `json:"gender"`
 	Birthdate         string       `json:"birthdate"`
 	Profession        string       `json:"profession"`
@@ -192,7 +193,7 @@ func BuildDay(ctx context.Context, st *store.Store, choice congress.DayChoice) (
 	d.Congressman = Profile{
 		ID: c.ID, Chamber: string(c.Chamber), ExternalID: c.ExternalID,
 		Name: c.FirstName, FirstSurname: c.FirstSurname, SecondSurname: c.SecondSurname,
-		Picture: c.ProfilePicture, Gender: c.Gender, Birthdate: c.Birthdate,
+		Picture: c.ProfilePicture, ProfileURL: c.ProfileURL, Gender: c.Gender, Birthdate: c.Birthdate,
 		Profession: c.Profession, Party: c.Party, PartyAlias: c.PartyAlias,
 		TwitterUsername: c.TwitterUsername, InstagramUsername: c.InstagramUsername,
 		Constituency: Constituency{Kind: string(c.ConstituencyKind), Name: c.ConstituencyName, Detail: c.ConstituencyDetail},

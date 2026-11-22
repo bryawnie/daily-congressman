@@ -42,6 +42,7 @@ type Congressman struct {
 	FirstSurname   string
 	SecondSurname  string
 	ProfilePicture string
+	ProfileURL     string // the congressman's page on the chamber's website
 	Gender         string
 	Birthdate      string // YYYY-MM-DD
 	Profession     string

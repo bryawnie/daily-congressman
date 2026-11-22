@@ -4,7 +4,9 @@
 
 	let { categories, chamber }: CategoryBreakdownProps = $props();
 
-	const categoriesByAmount = $derived([...categories].sort((first, second) => second.amount - first.amount));
+	const categoriesByAmount = $derived(
+		categories.filter((category) => category.amount !== 0).sort((first, second) => second.amount - first.amount)
+	);
 	const largestAmount = $derived(categoriesByAmount[0]?.amount ?? 0);
 </script>
 

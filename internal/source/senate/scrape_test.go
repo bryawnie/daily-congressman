@@ -228,6 +228,7 @@ func TestProfile(t *testing.T) {
 		TwitterUsername: "AndreaBal", InstagramUsername: "andreabal",
 		ConstituencyKind: congress.ConstituencyRegion, ConstituencyName: "Región del Maule",
 		ConstituencyDetail: "Circunscripción 9", LastUpdate: fixedNow(),
+		ProfileURL: s.siteURL + "/senadoras-y-senadores/listado-de-senadoras-y-senadores/andrea-balladares-letelier-sen",
 	}
 	if got != want {
 		t.Fatalf("profile = %+v\nwant      %+v", got, want)

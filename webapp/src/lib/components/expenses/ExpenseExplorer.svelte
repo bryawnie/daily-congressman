@@ -1,10 +1,11 @@
 <script lang="ts">
 	import type { ExpenseExplorerProps } from '#lib/types.ts';
 	import { monthSortKey } from '#lib/format/date.ts';
+	import MonthSummary from './MonthSummary.svelte';
 	import MonthBreakdown from './MonthBreakdown.svelte';
 	import MonthTotalsChart from './MonthTotalsChart.svelte';
 
-	let { months, chamber }: ExpenseExplorerProps = $props();
+	let { months, chamber, source = null }: ExpenseExplorerProps = $props();
 
 	const chronologicalMonths = $derived(
 		[...months].sort(
@@ -24,10 +25,21 @@
 		selectedPosition={activePosition}
 		onSelect={(position) => (selectedPosition = position)}
 	/>
+	{#if source}
+		<p class="source">
+			<a href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+		</p>
+	{/if}
+	<MonthSummary month={chronologicalMonths[activePosition]} />
 	<MonthBreakdown month={chronologicalMonths[activePosition]} {chamber} />
 {/if}
 
 <style>
+	.source {
+		text-align: end;
+		font-size: 0.75rem;
+	}
+
 	.empty {
 		color: var(--color-text-muted);
 	}

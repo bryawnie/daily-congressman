@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { SectionCardProps } from '#lib/types.ts';
 
-	let { title, description, pending = false, children }: SectionCardProps = $props();
+	let { title, description, source = null, pending = false, children }: SectionCardProps = $props();
 	const headingId = $props.id();
 </script>
 
@@ -17,13 +17,18 @@
 	{:else}
 		{@render children()}
 	{/if}
+	{#if source}
+		<p class="source">
+			<a href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+		</p>
+	{/if}
 </section>
 
 <style>
 	.card {
-		display: grid;
+		display: flex;
+		flex-direction: column;
 		gap: var(--space-4);
-		align-content: start;
 		padding: var(--space-5);
 		border: 1px solid var(--color-border);
 		border-radius: var(--radius-medium);
@@ -39,6 +44,12 @@
 	.pending {
 		color: var(--color-text-muted);
 		font-size: 0.9375rem;
+	}
+
+	.source {
+		margin-block-start: auto;
+		text-align: end;
+		font-size: 0.75rem;
 	}
 
 	header {

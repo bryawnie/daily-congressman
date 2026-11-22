@@ -76,6 +76,7 @@ Los nombres de campo van en camelCase. Ejemplo (recortado):
     "firstSurname": "Urrutia",
     "secondSurname": "Bonilla",
     "picture": "https://…",
+    "profileUrl": "https://www.senado.cl/…",
     "gender": "M",
     "birthdate": "1970-01-31",
     "profession": "Abogado",

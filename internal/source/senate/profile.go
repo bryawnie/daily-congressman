@@ -263,6 +263,7 @@ func (s *Source) Profile(ctx context.Context, m congress.Member) (congress.Congr
 		FirstSurname:       strings.TrimSpace(rec.FirstSurname),
 		SecondSurname:      strings.TrimSpace(rec.SecondSurname),
 		ProfilePicture:     rec.Image,
+		ProfileURL:         s.siteURL + senatorPagePath + rec.Slug,
 		Gender:             genderOf(rec.Gender),
 		Birthdate:          page.birthdate(),
 		Profession:         page.profession(),

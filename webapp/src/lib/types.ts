@@ -31,6 +31,7 @@ export interface Profile {
 	firstSurname: string;
 	secondSurname: string;
 	picture: string;
+	profileUrl: string;
 	gender: Gender;
 	birthdate: string;
 	profession: string;
@@ -184,11 +185,16 @@ export interface ComparisonRangeProps {
 export interface ExpenseExplorerProps {
 	months: MonthExpenses[];
 	chamber: Chamber;
+	source?: SourceLink | null;
 }
 
 export interface ExpenseTypePanelProps {
 	detail: ExpenseDetail;
 	chamber: Chamber;
+}
+
+export interface MonthSummaryProps {
+	month: MonthExpenses;
 }
 
 export interface MonthBreakdownProps {
@@ -202,8 +208,14 @@ export interface MonthTotalsChartProps {
 	onSelect: (position: number) => void;
 }
 
+export interface SourceLink {
+	label: string;
+	href: string;
+}
+
 export interface SectionCardProps {
 	title: string;
+	source?: SourceLink | null;
 	description?: string;
 	pending?: boolean;
 	children: Snippet;

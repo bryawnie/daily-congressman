@@ -6,6 +6,7 @@
 	import ProfileCard from '#lib/components/profile/ProfileCard.svelte';
 	import SectionCard from '#lib/components/ui/SectionCard.svelte';
 	import VotingList from '#lib/components/votings/VotingList.svelte';
+	import { sourceLinksOf } from '#lib/sources/links.ts';
 	import { fullName, roleTitle } from '#lib/format/person.ts';
 	import BeaconDetails from './BeaconDetails.svelte';
 	import DayPicker from './DayPicker.svelte';
@@ -13,6 +14,7 @@
 	let { day, daySummaries }: DayPageProps = $props();
 
 	const pendingSections = $derived(new Set(day.pending));
+	const sources = $derived(sourceLinksOf(day.congressman));
 	const name = $derived(fullName(day.congressman));
 </script>
 
@@ -29,12 +31,12 @@
 	<ProfileCard profile={day.congressman} date={day.date} />
 
 	<div class="pair">
-		<SectionCard title="Asistencia a sesiones" pending={pendingSections.has('attendance')}>
+		<SectionCard title="Asistencia a sesiones" source={sources.attendance} pending={pendingSections.has('attendance')}>
 			{#if day.attendance}
 				<AttendanceSummary attendance={day.attendance} />
 			{/if}
 		</SectionCard>
-		<SectionCard title="Proyectos presentados" pending={pendingSections.has('activity')}>
+		<SectionCard title="Proyectos presentados" source={sources.activity} pending={pendingSections.has('activity')}>
 			{#if day.activity}
 				<ActivitySummary activity={day.activity} />
 			{/if}
@@ -43,6 +45,7 @@
 
 	<SectionCard
 		title="Últimas votaciones"
+		source={sources.votings}
 		description="Cómo votó y cómo votó el resto de la sala."
 		pending={pendingSections.has('votings')}
 	>
@@ -54,7 +57,11 @@
 		description="Comparados con los demás parlamentarios. El puesto N.º 1 es quien más gastó."
 		pending={pendingSections.has('expenses')}
 	>
-		<ExpenseExplorer months={day.expenses} chamber={day.congressman.chamber} />
+		<ExpenseExplorer
+			months={day.expenses}
+			chamber={day.congressman.chamber}
+			source={sources.expenses}
+		/>
 	</SectionCard>
 
 	<BeaconDetails beacon={day.beacon} />

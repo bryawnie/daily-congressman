@@ -8,14 +8,19 @@
 		{ label: 'Pulso', value: beacon.pulseId },
 		{ label: 'Valor aleatorio', value: beacon.randOut }
 	]);
+
+	const pulseUrl = $derived(
+		`https://random.uchile.cl/beacon/2.1-beta/chain/${encodeURIComponent(beacon.chainId)}/pulse/${encodeURIComponent(beacon.pulseId)}`
+	);
 </script>
 
 <details>
 	<summary>Cómo se eligió a este parlamentario</summary>
 	<p>
-		El sorteo usa el valor aleatorio del pulso de las 00:00 (hora de Chile) del faro de
-		aleatoriedad de la Universidad de Chile, la lista vigente de parlamentarios y un algoritmo
-		documentado. Con esos tres datos públicos cualquiera puede repetir el cálculo y obtener el mismo
+		El sorteo usa el valor aleatorio del pulso de las 00:00 (hora de Chile) del
+		<a href="https://random.uchile.cl" target="_blank" rel="noreferrer"
+			>faro de aleatoriedad de la Universidad de Chile</a
+		>, la lista vigente de parlamentarios y un algoritmo documentado. Con esos tres datos públicos cualquiera puede repetir el cálculo y obtener el mismo
 		resultado.
 	</p>
 	<dl>
@@ -26,6 +31,9 @@
 			</div>
 		{/each}
 	</dl>
+	<p>
+		<a href={pulseUrl} target="_blank" rel="noreferrer">Ver este pulso en el faro de aleatoriedad</a>
+	</p>
 </details>
 
 <style>

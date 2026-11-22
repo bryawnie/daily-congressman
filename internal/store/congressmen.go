@@ -11,7 +11,7 @@ import (
 const congressmanColumns = `id, chamber, external_id, first_name, first_surname, second_surname,
 	profile_picture, gender, birthdate, profession, party, party_alias,
 	twitter_username, instagram_username, constituency_kind, constituency_name,
-	constituency_detail, last_update`
+	constituency_detail, last_update, profile_url`
 
 // UpsertCongressman inserts the congressman or updates it if (chamber,
 // external_id) already exists, and returns its internal ID. It uses an upsert
@@ -26,8 +26,8 @@ func (s *Store) UpsertCongressman(ctx context.Context, c *congress.Congressman) 
 		INSERT INTO congressmen (chamber, external_id, first_name, first_surname, second_surname,
 			profile_picture, gender, birthdate, profession, party, party_alias,
 			twitter_username, instagram_username, constituency_kind, constituency_name,
-			constituency_detail, last_update)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			constituency_detail, last_update, profile_url)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT (chamber, external_id) DO UPDATE SET
 			first_name = excluded.first_name,
 			first_surname = excluded.first_surname,
@@ -43,12 +43,13 @@ func (s *Store) UpsertCongressman(ctx context.Context, c *congress.Congressman) 
 			constituency_kind = excluded.constituency_kind,
 			constituency_name = excluded.constituency_name,
 			constituency_detail = excluded.constituency_detail,
-			last_update = excluded.last_update
+			last_update = excluded.last_update,
+			profile_url = excluded.profile_url
 		RETURNING id`,
 		c.Chamber, c.ExternalID, c.FirstName, c.FirstSurname, c.SecondSurname,
 		c.ProfilePicture, c.Gender, c.Birthdate, c.Profession, c.Party, c.PartyAlias,
 		c.TwitterUsername, c.InstagramUsername, c.ConstituencyKind, c.ConstituencyName,
-		c.ConstituencyDetail, formatTime(c.LastUpdate),
+		c.ConstituencyDetail, formatTime(c.LastUpdate), c.ProfileURL,
 	).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("store: upsert congressman: %w", err)
@@ -78,7 +79,7 @@ func (s *Store) scanCongressman(ctx context.Context, query string, args ...any) 
 		&c.ID, &c.Chamber, &c.ExternalID, &c.FirstName, &c.FirstSurname, &c.SecondSurname,
 		&c.ProfilePicture, &c.Gender, &c.Birthdate, &c.Profession, &c.Party, &c.PartyAlias,
 		&c.TwitterUsername, &c.InstagramUsername, &c.ConstituencyKind, &c.ConstituencyName,
-		&c.ConstituencyDetail, &lastUpdate,
+		&c.ConstituencyDetail, &lastUpdate, &c.ProfileURL,
 	)
 	if err != nil {
 		return nil, notFound(err)
