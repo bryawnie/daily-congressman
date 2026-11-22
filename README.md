@@ -111,7 +111,7 @@ cp .env.example .env     # ajustar CHOOSER_CHAMBERS, etc.
 docker compose up --build -d
 ```
 
-Levanta `jobs serve` y la API (puerto `API_PORT`, 8080 por defecto), ambos con la base en el volumen `data`. La imagen (`deploy/Dockerfile`) se construye por binario con `--build-arg BINARY=jobs|api`.
+Levanta `jobs serve` y la API (puerto `API_PORT`, 8080 por defecto), ambos con la base en el volumen `data`. La imagen (`Dockerfile`) se construye por binario con `--build-arg BINARY=jobs|api`.
 
 ## API
 

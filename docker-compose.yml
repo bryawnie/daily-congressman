@@ -2,7 +2,7 @@ services:
   jobs:
     build:
       context: .
-      dockerfile: deploy/Dockerfile
+      dockerfile: Dockerfile
       args:
         BINARY: jobs
     command: ["serve"]
@@ -17,7 +17,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: deploy/Dockerfile
+      dockerfile: Dockerfile
       args:
         BINARY: api
     restart: unless-stopped
@@ -31,5 +31,33 @@ services:
     depends_on:
       - jobs
 
+  webapp-builder:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+      target: builder
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:8080
+      WEBAPP_INTERVAL: ${WEBAPP_INTERVAL:-900}
+    volumes:
+      - site:/site
+    depends_on:
+      - api
+
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile
+      target: server
+    restart: unless-stopped
+    ports:
+      - "${WEBAPP_PORT:-8081}:80"
+    volumes:
+      - site:/site:ro
+    depends_on:
+      - webapp-builder
+
 volumes:
   data:
+  site:

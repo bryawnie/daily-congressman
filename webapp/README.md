@@ -16,6 +16,10 @@ Requiere Node 22.17 o superior (`.nvmrc` fija 26.13.1, la LTS vigente).
 
 Con `API_URL` se elige de dónde se leen los datos al construir (por defecto `http://localhost:8080`). Si la API no responde, la construcción falla: nunca se publica un sitio con datos a medias.
 
+## Docker
+
+`docker compose up -d` levanta `webapp-builder`, que reconstruye el sitio contra la API cada `WEBAPP_INTERVAL` segundos (900 por defecto) y lo publica de forma atómica, y `webapp` (Caddy), que lo sirve en `WEBAPP_PORT` (8081 por defecto). Si un build falla, se sigue sirviendo el sitio anterior.
+
 ## Cómo se arma
 
 - `/` muestra el día más reciente y `/dias/AAAA-MM-DD` cada uno de los últimos 8 días. Todas las páginas se prerrenderizan, así que hay que volver a construir después de que el job sortee y refresque (una vez al día).

@@ -1,4 +1,4 @@
-# One image per binary: docker build --build-arg BINARY=jobs -f deploy/Dockerfile .
+# One image per binary: docker build --build-arg BINARY=jobs .
 FROM golang:1.27-alpine AS build
 ARG BINARY=jobs
 WORKDIR /src

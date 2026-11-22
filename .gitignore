@@ -23,7 +23,6 @@ launch.json
 .vscode
 
 # Production
-Caddyfile
 Dockerfile.prod
 docker-compose.prod.yml
 PLAN.md
