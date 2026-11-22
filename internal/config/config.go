@@ -9,9 +9,8 @@ import (
 const (
 	// DefaultDBPath is used when DB_PATH is not set.
 	DefaultDBPath = "data/congressmen.db"
-	// DefaultChambers is used when CHOOSER_CHAMBERS is not set. The Senate joins
-	// the draw once its source is implemented.
-	DefaultChambers = "deputies"
+	// DefaultChambers is used when CHOOSER_CHAMBERS is not set.
+	DefaultChambers = "senate"
 )
 
 // Config is the runtime configuration shared by the binaries.
