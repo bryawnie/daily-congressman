@@ -2,6 +2,7 @@ package beacon
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -48,5 +49,16 @@ func TestPulseAtErrors(t *testing.T) {
 				t.Fatal("expected error")
 			}
 		})
+	}
+}
+
+func TestPulseAtNotFoundMeansNotAvailableYet(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.NotFound(w, r)
+	}))
+	defer srv.Close()
+	_, err := NewClient(WithBaseURL(srv.URL)).PulseAt(context.Background(), time.Now())
+	if !errors.Is(err, ErrNotAvailable) {
+		t.Fatalf("err = %v, want ErrNotAvailable", err)
 	}
 }

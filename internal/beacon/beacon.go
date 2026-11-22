@@ -4,6 +4,7 @@ package beacon
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -12,6 +13,10 @@ import (
 
 // DefaultBaseURL is the Random UChile beacon (version 2.1-beta).
 const DefaultBaseURL = "https://random.uchile.cl/beacon/2.1-beta"
+
+// ErrNotAvailable means the beacon has not published the requested pulse yet.
+// It is expected right after midnight and is worth retrying a bit later.
+var ErrNotAvailable = errors.New("beacon: pulse not available yet")
 
 // Pulse is the beacon record used to draw a day's congressman.
 type Pulse struct {
@@ -72,6 +77,9 @@ func (c *Client) PulseAt(ctx context.Context, t time.Time) (Pulse, error) {
 		return Pulse{}, fmt.Errorf("beacon: fetch pulse: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusNotFound {
+		return Pulse{}, ErrNotAvailable
+	}
 	if resp.StatusCode != http.StatusOK {
 		return Pulse{}, fmt.Errorf("beacon: fetch pulse: unexpected status %s", resp.Status)
 	}

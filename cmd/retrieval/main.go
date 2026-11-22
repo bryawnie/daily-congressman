@@ -12,6 +12,7 @@ import (
 
 	"github.com/bryawnie/daily-congressman/internal/config"
 	"github.com/bryawnie/daily-congressman/internal/congress"
+	"github.com/bryawnie/daily-congressman/internal/retrieval"
 	"github.com/bryawnie/daily-congressman/internal/source"
 	"github.com/bryawnie/daily-congressman/internal/source/deputies"
 	"github.com/bryawnie/daily-congressman/internal/source/senate"
@@ -139,60 +140,35 @@ func update(chamber, id string) error {
 		return err
 	}
 
+	sy := &retrieval.Syncer{Store: st, Sources: reg}
 	m := congress.Member{Chamber: src.Chamber(), ExternalID: extID}
-	profile, err := src.Profile(ctx, m)
-	if err != nil {
-		return fmt.Errorf("profile: %w", err)
-	}
-	cid, err := st.UpsertCongressman(ctx, &profile)
+	cid, profile, err := sy.Profile(ctx, m)
 	if err != nil {
 		return err
 	}
 	fmt.Printf("congressman %d: %s %s %s (%s, id %d)\n", cid, profile.FirstName, profile.FirstSurname, profile.SecondSurname, chamber, extID)
 
-	var failures []string
-	step := func(name string, err error, saved string) {
-		switch {
-		case errors.Is(err, congress.ErrNotSupported):
-			fmt.Printf("  %-11s not supported by this source yet\n", name)
-		case err != nil:
-			fmt.Printf("  %-11s FAILED: %v\n", name, err)
-			failures = append(failures, name)
+	daily, err := sy.Daily(ctx, cid, m)
+	if err != nil {
+		return err
+	}
+	expenses, err := sy.Expenses(ctx, cid, m)
+	if err != nil {
+		return err
+	}
+	report := append(daily, expenses...)
+	for _, s := range report {
+		switch s.Status {
+		case retrieval.Pending:
+			fmt.Printf("  %-11s not supported by this source yet\n", s.Name)
+		case retrieval.Failed:
+			fmt.Printf("  %-11s FAILED: %v\n", s.Name, s.Err)
 		default:
-			fmt.Printf("  %-11s %s\n", name, saved)
+			fmt.Printf("  %-11s %s\n", s.Name, s.Detail)
 		}
 	}
-
-	att, err := src.Attendance(ctx, m)
-	if err == nil {
-		err = st.UpsertAttendance(ctx, cid, att)
-	}
-	step("attendance", err, fmt.Sprintf("%d of %d sessions", att.Present, att.Total))
-
-	votings, err := src.Votings(ctx, m, 10)
-	if err == nil {
-		err = st.ReplaceVotings(ctx, cid, votings)
-	}
-	step("votings", err, fmt.Sprintf("%d saved", len(votings)))
-
-	projects, err := src.Activity(ctx, m)
-	if err == nil {
-		err = st.UpsertLawProjects(ctx, cid, projects)
-	}
-	step("activity", err, fmt.Sprintf("%d projects", len(projects)))
-
-	exp, err := src.Expenses(ctx, m)
-	if err == nil {
-		if err = st.UpsertOperationalExpenses(ctx, cid, exp.Operational); err == nil {
-			if err = st.UpsertOfficeExpenses(ctx, cid, exp.Offices); err == nil {
-				err = st.UpsertStaffExpenses(ctx, cid, exp.Staff)
-			}
-		}
-	}
-	step("expenses", err, fmt.Sprintf("%d operational, %d offices, %d staff rows", len(exp.Operational), len(exp.Offices), len(exp.Staff)))
-
-	if len(failures) > 0 {
-		return fmt.Errorf("%d kind(s) of data failed: %v", len(failures), failures)
+	if failed := report.Failed(); len(failed) > 0 {
+		return fmt.Errorf("%d kind(s) of data failed: %w", len(failed), report.Err())
 	}
 	return nil
 }

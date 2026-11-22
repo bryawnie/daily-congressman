@@ -276,3 +276,40 @@ func TestChooseNonexistentCongressmanFails(t *testing.T) {
 		t.Fatal("expected foreign key violation")
 	}
 }
+
+func TestJobStateAndErrors(t *testing.T) {
+	s := newTestStore(t)
+	ctx := context.Background()
+	at := time.Date(2026, 11, 20, 12, 0, 0, 0, time.UTC)
+
+	if done, _ := s.IsDone(ctx, "profiles", "senate:1", "2026-11"); done {
+		t.Fatal("nothing is done yet")
+	}
+	for i := 0; i < 2; i++ { // marking twice is harmless
+		if err := s.MarkDone(ctx, "profiles", "senate:1", "2026-11", at); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if done, _ := s.IsDone(ctx, "profiles", "senate:1", "2026-11"); !done {
+		t.Fatal("should be done")
+	}
+	if done, _ := s.IsDone(ctx, "profiles", "senate:1", "2026-12"); done {
+		t.Fatal("another period is independent")
+	}
+	if err := s.ClearDone(ctx, "profiles", "2026-11"); err != nil {
+		t.Fatal(err)
+	}
+	if done, _ := s.IsDone(ctx, "profiles", "senate:1", "2026-11"); done {
+		t.Fatal("ClearDone should forget it")
+	}
+
+	for _, msg := range []string{"first", "second"} {
+		if err := s.LogJobError(ctx, JobError{At: at, Job: "expenses", Key: "senate:1", Period: "2026-11", Error: msg}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	errs, err := s.ListJobErrors(ctx, 10)
+	if err != nil || len(errs) != 2 || errs[0].Error != "second" || !errs[0].At.Equal(at) {
+		t.Fatalf("errors = %+v, err = %v", errs, err)
+	}
+}

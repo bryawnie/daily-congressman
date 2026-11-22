@@ -1,19 +1,18 @@
-version: "3.8"
-
 services:
-  diputadodeldia-back:
-    container_name: ddd-back
-    build: ./legacy/backend
-    ports:
-      - "5000:5000"
+  jobs:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        BINARY: jobs
+    command: ["serve"]
+    restart: unless-stopped
+    environment:
+      CHOOSER_CHAMBERS: ${CHOOSER_CHAMBERS:-senate}
+      JOBS_INTERVAL: ${JOBS_INTERVAL:-15m}
+      JOBS_PAUSE: ${JOBS_PAUSE:-500ms}
     volumes:
-      - app-data:/app/data
-
-  diputadodeldia-front:
-    container_name: ddd-front
-    build: ./legacy/frontend
-    ports:
-      - "3000:3000"
+      - data:/data
 
 volumes:
-  app-data:
+  data:
