@@ -1,6 +1,6 @@
 BINARIES := retrieval chooser jobs api
 
-.PHONY: build test vet fmt clean
+.PHONY: build test vet fmt clean webapp-check webapp-build
 
 build:
 	@mkdir -p bin
@@ -15,5 +15,11 @@ vet:
 fmt:
 	gofmt -l -w cmd internal
 
+webapp-check:
+	cd webapp && npm run check
+
+webapp-build:
+	cd webapp && npm run build
+
 clean:
-	rm -rf bin
+	rm -rf bin webapp/build
