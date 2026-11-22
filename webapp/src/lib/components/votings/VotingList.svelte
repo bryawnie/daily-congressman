@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+	import Icon from '#lib/components/ui/Icon.svelte';
 	import type { Voting } from '#lib/types.ts';
 	import VotingCard from './VotingCard.svelte';
 
@@ -23,6 +25,7 @@
 	{#if latest.length > INITIAL_COUNT}
 		<button type="button" aria-expanded={expanded} onclick={() => (expanded = !expanded)}>
 			{expanded ? 'Mostrar menos' : `Ver las últimas ${latest.length} votaciones`}
+			<Icon icon={expanded ? faChevronUp : faChevronDown} />
 		</button>
 	{/if}
 {/if}

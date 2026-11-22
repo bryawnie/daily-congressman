@@ -1,13 +1,18 @@
 <script lang="ts">
+	import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 	import type { SectionCardProps } from '#lib/types.ts';
+	import Icon from './Icon.svelte';
 
-	let { title, description, source = null, pending = false, children }: SectionCardProps = $props();
+	let { title, icon, description, source = null, pending = false, children }: SectionCardProps = $props();
 	const headingId = $props.id();
 </script>
 
 <section class="card" aria-labelledby={headingId}>
 	<header>
-		<h2 id={headingId}>{title}</h2>
+		<h2 id={headingId}>
+			{#if icon}<Icon {icon} />{/if}
+			{title}
+		</h2>
 		{#if description}
 			<p class="description">{description}</p>
 		{/if}
@@ -19,7 +24,9 @@
 	{/if}
 	{#if source}
 		<p class="source">
-			<a href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+			<a href={source.href} target="_blank" rel="noreferrer">{source.label}
+				<Icon icon={faArrowUpRightFromSquare} /></a
+			>
 		</p>
 	{/if}
 </section>
@@ -37,7 +44,14 @@
 	}
 
 	h2 {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
 		font-size: 1.125rem;
+	}
+
+	h2 :global(.icon) {
+		color: var(--color-accent);
 	}
 
 	.description,

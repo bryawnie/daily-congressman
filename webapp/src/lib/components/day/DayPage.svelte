@@ -1,4 +1,10 @@
 <script lang="ts">
+	import {
+		faCalendarCheck,
+		faCoins,
+		faFileLines,
+		faSquarePollVertical
+	} from '@fortawesome/free-solid-svg-icons';
 	import type { DayPageProps } from '#lib/types.ts';
 	import ActivitySummary from '#lib/components/activity/ActivitySummary.svelte';
 	import AttendanceSummary from '#lib/components/attendance/AttendanceSummary.svelte';
@@ -31,12 +37,12 @@
 	<ProfileCard profile={day.congressman} date={day.date} />
 
 	<div class="pair">
-		<SectionCard title="Asistencia a sesiones" source={sources.attendance} pending={pendingSections.has('attendance')}>
+		<SectionCard title="Asistencia a sesiones" icon={faCalendarCheck} source={sources.attendance} pending={pendingSections.has('attendance')}>
 			{#if day.attendance}
 				<AttendanceSummary attendance={day.attendance} />
 			{/if}
 		</SectionCard>
-		<SectionCard title="Proyectos presentados" source={sources.activity} pending={pendingSections.has('activity')}>
+		<SectionCard title="Proyectos presentados" icon={faFileLines} source={sources.activity} pending={pendingSections.has('activity')}>
 			{#if day.activity}
 				<ActivitySummary activity={day.activity} />
 			{/if}
@@ -45,6 +51,7 @@
 
 	<SectionCard
 		title="Últimas votaciones"
+		icon={faSquarePollVertical}
 		source={sources.votings}
 		description="Cómo votó y cómo votó el resto de la sala."
 		pending={pendingSections.has('votings')}
@@ -54,6 +61,7 @@
 
 	<SectionCard
 		title="Gastos"
+		icon={faCoins}
 		description="Comparados con los demás parlamentarios. El puesto N.º 1 es quien más gastó."
 		pending={pendingSections.has('expenses')}
 	>

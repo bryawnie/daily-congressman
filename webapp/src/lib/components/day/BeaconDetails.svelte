@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { faShieldHalved } from '@fortawesome/free-solid-svg-icons';
+	import Icon from '#lib/components/ui/Icon.svelte';
 	import type { Beacon } from '#lib/types.ts';
 
 	let { beacon }: { beacon: Beacon } = $props();
@@ -15,7 +17,7 @@
 </script>
 
 <details>
-	<summary>Cómo se eligió a este parlamentario</summary>
+	<summary><Icon icon={faShieldHalved} /> Cómo se eligió a este parlamentario</summary>
 	<p>
 		El sorteo usa el valor aleatorio del pulso de las 00:00 (hora de Chile) del
 		<a href="https://random.uchile.cl" target="_blank" rel="noreferrer"

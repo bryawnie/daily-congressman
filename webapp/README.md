@@ -4,7 +4,7 @@ Sitio estático en SvelteKit que muestra el congresista del día y los 7 días a
 
 ## Comandos
 
-Requiere Node 22.17 o superior (`.nvmrc` fija 24.22.2).
+Requiere Node 22.17 o superior (`.nvmrc` fija 26.13.1, la LTS vigente).
 
 | Comando | Qué hace |
 |---|---|

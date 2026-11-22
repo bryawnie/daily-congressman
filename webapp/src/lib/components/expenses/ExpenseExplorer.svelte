@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ExpenseExplorerProps } from '#lib/types.ts';
 	import { monthSortKey } from '#lib/format/date.ts';
+	import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+	import Icon from '#lib/components/ui/Icon.svelte';
 	import MonthSummary from './MonthSummary.svelte';
 	import MonthBreakdown from './MonthBreakdown.svelte';
 	import MonthTotalsChart from './MonthTotalsChart.svelte';
@@ -27,7 +29,9 @@
 	/>
 	{#if source}
 		<p class="source">
-			<a href={source.href} target="_blank" rel="noreferrer">{source.label}</a>
+			<a href={source.href} target="_blank" rel="noreferrer">{source.label}
+				<Icon icon={faArrowUpRightFromSquare} /></a
+			>
 		</p>
 	{/if}
 	<MonthSummary month={chronologicalMonths[activePosition]} />

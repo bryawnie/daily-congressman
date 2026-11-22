@@ -1,3 +1,4 @@
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import type { Snippet } from 'svelte';
 
 export type Chamber = 'deputies' | 'senate';
@@ -213,8 +214,13 @@ export interface SourceLink {
 	href: string;
 }
 
+export interface IconProps {
+	icon: IconDefinition;
+}
+
 export interface SectionCardProps {
 	title: string;
+	icon?: IconDefinition;
 	source?: SourceLink | null;
 	description?: string;
 	pending?: boolean;
